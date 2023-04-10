@@ -1,0 +1,19 @@
+{
+  "name": "acs-2230-reddit-clone",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Babaganouche622/ACS-2230-Reddit-Clone.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Babaganouche622/ACS-2230-Reddit-Clone/issues"
+  },
+  "homepage": "https://github.com/Babaganouche622/ACS-2230-Reddit-Clone#readme"
+}
