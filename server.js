@@ -1,15 +1,23 @@
 const express = require('express');
-const { engine } = require('express-handlebars');
-const Handlebars = require('handlebars');
+const exphbs = require('express-handlebars');
 
+// Set up express app
 const app = express();
+app.use(express.static('public'));
 
-app.engine('handlebars', engine());
+
+// Set db
+require('./data/reddit-db');
+
+// Middleware
+app.engine('handlebars', exphbs.engine({ defaultLayout: 'main' }));
 app.set('view engine', 'handlebars');
 app.set('views', './views');
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
-app.get('/', (req, res) => {
-    res.render('home');
-});
+// Set controllers
+require('./controllers/posts')(app);
 
+// Server
 app.listen(3000);
