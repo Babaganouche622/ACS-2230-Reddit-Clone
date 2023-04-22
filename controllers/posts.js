@@ -1,7 +1,4 @@
 const Post = require('../models/post');
-// const { body, validationResult } = require('express-validator/check');
-// const { sanitizeBody } = require('express-validator/filter');
-
 
 module.exports = (app) => {
   // INDEX
@@ -34,7 +31,7 @@ module.exports = (app) => {
   // SHOW
   app.get('/posts/:id', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.id).lean();
+      const post = await Post.findById(req.params.id).lean().populate('comments');
       res.render('posts-show', { post: post });
     } catch (err) {
       console.log(err.message);

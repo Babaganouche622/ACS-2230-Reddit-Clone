@@ -18,6 +18,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Set controllers
 require('./controllers/posts')(app);
+require('./controllers/comments')(app);
 
 // Server
 app.listen(3000);
