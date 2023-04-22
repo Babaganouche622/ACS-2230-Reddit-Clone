@@ -1,5 +1,6 @@
 const express = require('express');
 const exphbs = require('express-handlebars');
+const cookieParser = require('cookie-parser');
 
 // Set up express app
 const app = express();
@@ -15,10 +16,12 @@ app.set('view engine', 'handlebars');
 app.set('views', './views');
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cookieParser());
 
 // Set controllers
 require('./controllers/posts')(app);
 require('./controllers/comments')(app);
+require('./controllers/auth.js')(app);
 
 // Server
 app.listen(3000);
