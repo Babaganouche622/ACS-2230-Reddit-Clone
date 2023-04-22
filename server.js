@@ -21,3 +21,5 @@ require('./controllers/posts')(app);
 
 // Server
 app.listen(3000);
+
+module.exports = app;
