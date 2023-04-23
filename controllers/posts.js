@@ -4,8 +4,9 @@ module.exports = (app) => {
   // INDEX
   app.get('/', async (req, res) => {
     try {
-    const posts = await Post.find({}).lean();
-    return res.render('posts-index', { posts: posts }); 
+      const currentUser = req.user;
+      const posts = await Post.find({}).lean();
+      return res.render('posts-index', { posts, currentUser });
     } catch (err) {
       console.log(err.message);
     }
@@ -18,13 +19,16 @@ module.exports = (app) => {
 
   // Create Post
   app.post('/posts/new', async (req, res) => {
-    const post = new Post(req.body);
-  
-    try {
-      await post.save();
-      res.redirect('/');
-    } catch (err) {
-      console.log(err);
+    if (req.user) {
+      try {
+        const post = new Post(req.body);
+        await post.save();
+        res.redirect('/');
+      } catch (err) {
+        console.log(err);
+      }
+    } else {
+      return res.status(401); // UNAUTHORIZED
     }
   });
 

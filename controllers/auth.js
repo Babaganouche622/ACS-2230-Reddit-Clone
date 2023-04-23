@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 module.exports = (app) => {
   // SIGN UP FORM
@@ -15,7 +16,7 @@ module.exports = (app) => {
       res.redirect('/');
     } catch (err) {
       console.log(err.message);
-      return res.status(400).send({ err: err });
+      return res.status(400).send({ err: err.message });
     }
   });
 
@@ -31,7 +32,7 @@ module.exports = (app) => {
   // LOGIN
   app.post('/login', async (req, res) => {
     const { username, password } = req.body;
-    const user = await User.findOne({ username });
+    const user = await User.findOne({ username }, 'username password');
     if (!user) {
       // User not found
       return res.status(401).send({ message: 'Wrong Username or Password' });
