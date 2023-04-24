@@ -9,4 +9,14 @@ const postSchema = new Schema({
   author: { type: Schema.Types.ObjectId, ref: 'User', required: true },
 });
 
+postSchema
+  .pre('findOne', function (next) {
+    this.populate('author');
+    next();
+  })
+  .pre('find', function (next) {
+    this.populate('author');
+    next();
+  });
+
 module.exports = model('Post', postSchema);

@@ -5,13 +5,18 @@ module.exports = (app) => {
   // CREATE Comment
   app.post('/posts/:postId/comments', async (req, res) => {
     try {
-      const post = await Post.findById(req.params.postId);
-      const comment = new Comment(req.body);
-      comment.author = req.user._id;
-      post.comments.unshift(comment);
-      await comment.save();
-      await post.save();
-      res.redirect(`/`);
+      if (req.user) {
+        const comment = new Comment(req.body);
+        const userId = req.user._id;
+        comment.author = userId;
+        await comment.save();
+        const post = await Post.findById(req.params.postId);
+        post.comments.unshift(comment);
+        await post.save();
+        res.redirect(`/`);
+      } else {
+        return res.status(401); // UNAUTHORIZED
+      }
     } catch (err) {
       console.log(err);
     }
