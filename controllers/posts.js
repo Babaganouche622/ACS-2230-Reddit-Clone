@@ -25,28 +25,33 @@ module.exports = (app) => {
   app.post('/posts/new', async (req, res) => {
     if (req.user) {
       try {
-        const userId = req.user._id;
-        const post = new Post(req.body);
-        post.author = userId;
-        
-        await post.save();
-        const user = await User.findById(userId);
-        user.posts.unshift(post);
-        user.save();
-        res.redirect(`/posts/${post._id}`);
+          const userId = req.user._id;
+          const currentUser = req.user;
+          subredditArray = req.body.subreddits.replaceAll(' ', '').split(',');
+          req.body.subreddits = subredditArray;
+          const post = new Post(req.body);
+          // post.upVotes = [];
+          // post.downVotes = [];
+          // post.voteScore = 0;
+          post.author = userId;
+          await post.save();
+          const user = await User.findById(userId);
+          user.posts.unshift(post);
+          await user.save();
+          return res.redirect('/');
       } catch (err) {
-        console.log(err);
+          console.log(err.message);
       }
-    } else {
+  } else {
       return res.status(401); // UNAUTHORIZED
-    }
-  });
+  }
+});
 
   // SHOW
   app.get('/posts/:id', async (req, res) => {
     try {
       const currentUser = req.user;
-      const post = await Post.findById(req.params.id).lean();
+      const post = await Post.findById(req.params.id).populate('comments').lean();
       res.render('posts-show', { post, currentUser });
     } catch (err) {
       console.log(err.message);

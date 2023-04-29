@@ -8,22 +8,10 @@ const commentSchema = new Schema({
 }, { timestamps: true });
 
 commentSchema
-  .pre('findOne', function (next) {
-    this.populate('author');
-    next();
-  })
-  .pre('find', function (next) {
-    this.populate('author');
-    next();
-  })
-  .pre('find', function (next) {
-    this.populate('comments');
-    next();
-  })
-  .pre('findOne', function (next) {
-    this.populate('comments');
-    next();
-  });
+  .pre('findOne', Populate('author'))
+  .pre('find', Populate('author'))
+  .pre('findOne', Populate('comments'))
+  .pre('find', Populate('comments'));
 
 
 

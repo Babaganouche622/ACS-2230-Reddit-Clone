@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const exphbs = require('express-handlebars');
 const cookieParser = require('cookie-parser');
@@ -24,6 +25,7 @@ app.use(checkAuth);
 require('./controllers/posts')(app);
 require('./controllers/comments')(app);
 require('./controllers/auth.js')(app);
+require('./controllers/replies.js')(app);
 
 // Server
 app.listen(3000);

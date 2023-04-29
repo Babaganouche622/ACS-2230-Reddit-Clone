@@ -11,13 +11,7 @@ const postSchema = new Schema({
 });
 
 postSchema
-  .pre('findOne', function (next) {
-    this.populate('author');
-    next();
-  })
-  .pre('find', function (next) {
-    this.populate('author');
-    next();
-  });
+  .pre('findOne', Populate('author'))
+  .pre('find', Populate('author'));
 
 module.exports = model('Post', postSchema);
