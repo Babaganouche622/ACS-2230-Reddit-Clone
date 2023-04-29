@@ -1,13 +1,13 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const User = require('../models/user');
-const user = require('../models/user');
 
 module.exports = (app) => {
   // INDEX
   app.get('/', async (req, res) => {
+    const currentUser = req.user;
+    console.log("This is current user:", currentUser)
     try {
-      const currentUser = req.user;
       const posts = await Post.find({}).lean().populate('author');
       return res.render('posts-index', { posts, currentUser });
     } catch (err) {
