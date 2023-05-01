@@ -1,72 +1,104 @@
 const Post = require('../models/post');
 const Comment = require('../models/comment');
 const User = require('../models/user');
+const checkAuth = require('../middleware/checkAuth');
 
 module.exports = (app) => {
-  // INDEX
+  // Apply the checkAuth middleware to all routes in this file
+  app.use(checkAuth);
+
+  // Root path
   app.get('/', async (req, res) => {
-    const currentUser = req.user;
-    console.log("This is current user:", currentUser)
     try {
       const posts = await Post.find({}).lean().populate('author');
+      const currentUser = req.user;
       return res.render('posts-index', { posts, currentUser });
     } catch (err) {
       console.log(err.message);
     }
   });
 
-  // NEW
-  app.get('/posts/new', (req, res) => {
-    const currentUser = req.user;
-    res.render('posts-new', {currentUser});
+  // New Post
+  app.get('/posts/new', checkAuth, (req, res) => {
+    if (req.user) {
+      res.render('posts-new');
+    } else {
+      return res.status(401).send('Unauthorized'); // UNAUTHORIZED
+    }
   });
 
   // Create Post
-  app.post('/posts/new', async (req, res) => {
-    if (req.user) {
-      try {
-          const userId = req.user._id;
-          const currentUser = req.user;
-          subredditArray = req.body.subreddits.replaceAll(' ', '').split(',');
-          req.body.subreddits = subredditArray;
-          const post = new Post(req.body);
-          // post.upVotes = [];
-          // post.downVotes = [];
-          // post.voteScore = 0;
-          post.author = userId;
-          await post.save();
-          const user = await User.findById(userId);
-          user.posts.unshift(post);
-          await user.save();
-          return res.redirect('/');
-      } catch (err) {
-          console.log(err.message);
-      }
-  } else {
-      return res.status(401); // UNAUTHORIZED
-  }
-});
-
-  // SHOW
-  app.get('/posts/:id', async (req, res) => {
+  app.post('/posts/new', checkAuth, async (req, res) => {
     try {
-      const currentUser = req.user;
-      const post = await Post.findById(req.params.id).populate('comments').lean();
-      res.render('posts-show', { post, currentUser });
+      if (req.user) {
+        const userId = req.user._id;
+        const post = new Post(req.body);
+        post.author = userId;
+        post.upVotes = [];
+        post.downVotes = [];
+        post.voteScore = 0;
+  
+        await post.save();
+        
+        const user = await User.findById(userId);
+        user.posts.unshift(post);
+        await user.save();
+  
+        // REDIRECT TO THE NEW POST
+        return res.redirect(`/posts/${post._id}`);
+      } else {
+        return res.status(401).send('Unauthorized');
+      }
     } catch (err) {
       console.log(err.message);
     }
   });
 
-  // SUBREDDIT
-  app.get('/n/:subreddit', async (req, res) => {
+  // Show Post
+  app.get('/posts/:id', async (req, res) => {
+    const currentUser = req.user;
+  
     try {
-      const currentUser = req.user;
-      const posts = await Post.find({ subreddit: req.params.subreddit }).lean();
+      const post = await Post.findById(req.params.id).populate('comments').lean();
+      return res.render('posts-show', { post, currentUser });
+    } catch (err) {
+      console.log(err.message);
+    }
+  });
+
+  // Subreddit
+  app.get('/n/:subreddit', async (req, res) => {
+    const currentUser = req.user;
+
+    try {
+      const posts = await Post.find({ subreddit: req.params.subreddit }).lean()
       res.render('posts-index', { posts, currentUser });
     } catch (err) {
       console.log(err.message);
     }
   });
 
+  app.put('/posts/:id/vote-up', async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+      post.upVotes.push(req.user._id);
+      post.voteScore += 1;
+      await post.save();
+      return res.status(200);
+    } catch (err) {
+      console.log(err);
+    }
+  });
+  
+  app.put('/posts/:id/vote-down', async (req, res) => {
+    try {
+      const post = await Post.findById(req.params.id);
+      post.downVotes.push(req.user._id);
+      post.voteScore -= 1;
+      await post.save();
+      return res.status(200);
+    } catch (err) {
+      console.log(err);
+    }
+  });
 };

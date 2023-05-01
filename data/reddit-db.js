@@ -1,7 +1,4 @@
-/* Mongoose Connection */
-/* Mongoose Connection */
 const mongoose = require('mongoose');
-
 const url = 'mongodb://localhost/reddit-db';
 
 mongoose.connect(url, { useNewUrlParser: true })

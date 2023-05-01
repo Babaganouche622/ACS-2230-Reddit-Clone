@@ -22,9 +22,9 @@ app.use(cookieParser());
 app.use(checkAuth);
 
 // Set controllers
+require('./controllers/auth.js')(app);
 require('./controllers/posts')(app);
 require('./controllers/comments')(app);
-require('./controllers/auth.js')(app);
 require('./controllers/replies.js')(app);
 
 // Server
